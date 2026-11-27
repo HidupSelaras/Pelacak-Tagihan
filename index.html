@@ -17,68 +17,68 @@
 
 <div class="card">
     <h2>Masuk</h2>
-    <div id="status"></div>
+    <div id="status">Memuat sistem...</div> <!-- Pesan loading awal -->
 
     <form id="auth-form">
         <input type="email" id="email" placeholder="Email" required>
         <input type="password" id="password" placeholder="Kata Sandi" required>
-        <button type="submit">Masuk</button>
+        <button type="submit" id="submit-btn" disabled>Masuk</button> <!-- Tombol nonaktif dulu -->
     </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    // TAMPILKAN PESAN DI SINI JIKA ADA MASALAH
-    const statusDiv = document.getElementById('status');
-
-    try {
-        const SUPABASE_URL = 'https://jetxgfzlzitprejjiiep.supabase.co';
-        // PASTIKAN KUNCI DI BAWAH INI DISALIN UTUH SAMPAI HABIS
-        const SUPABASE_KEY = 'sb_publishable_m6xvCvQxecLJqGVNV75iCw_tYoYOOJs'; 
-
-        // Cek apakah kunci sudah benar (harus diawali sb_publishable_)
-        if (!SUPABASE_KEY.startsWith('sb_publishable_')) {
-            throw new Error("Kunci API salah atau tidak lengkap!");
-        }
-
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Fungsi ini akan dijalankan SETELAH halaman dan library Supabase selesai dimuat sepenuhnya
+    window.onload = function() {
+        const statusDiv = document.getElementById('status');
+        const submitBtn = document.getElementById('submit-btn');
         const authForm = document.getElementById('auth-form');
 
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            statusDiv.innerText = 'Memproses...';
-            statusDiv.style.color = 'blue';
+        try {
+            const SUPABASE_URL = 'https://jetxgfzlzitprejjiiep.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_m6xvCvQxecLJqGVNV75iCw_tYoYOOJs'; 
+
+            // Inisialisasi Supabase
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            // Jika berhasil dimuat, ubah status dan aktifkan tombol
+            statusDiv.innerText = 'Sistem siap. Silakan login.';
+            statusDiv.style.color = 'green';
+            submitBtn.disabled = false;
 
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
+            authForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                statusDiv.innerText = 'Memproses...';
+                statusDiv.style.color = 'blue';
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
 
-                if (error) {
-                    // Jika email/password salah, munculkan pesan aslinya di sini
-                    statusDiv.innerText = "Gagal: " + error.message;
+                try {
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                    if (error) {
+                        statusDiv.innerText = "Gagal: " + error.message;
+                        statusDiv.style.color = 'red';
+                    } else {
+                        statusDiv.innerText = "SUKSES! Login berhasil.";
+                        statusDiv.style.color = 'green';
+                    }
+                } catch (err) {
+                    statusDiv.innerText = "Error Jaringan: " + err.message;
                     statusDiv.style.color = 'red';
-                } else {
-                    statusDiv.innerText = "SUKSES! Login berhasil.";
-                    statusDiv.style.color = 'green';
                 }
-            } catch (err) {
-                statusDiv.innerText = "Error Jaringan: " + err.message;
-                statusDiv.style.color = 'red';
-            }
-        });
+            });
 
-    } catch (error) {
-        // Jika ada masalah saat memuat skrip/kunci, pesan ini PASTI muncul
-        statusDiv.innerText = error.message;
-        statusDiv.style.color = 'red';
-        statusDiv.style.fontSize = '12px';
-    }
+        } catch (error) {
+            statusDiv.innerText = "Error Sistem: " + error.message;
+            statusDiv.style.color = 'red';
+        }
+    };
 </script>
 
 </body>

@@ -17,32 +17,36 @@
 
 <div class="card">
     <h2>Masuk</h2>
-    <div id="status">Memuat sistem...</div> <!-- Pesan loading awal -->
+    <div id="status">Memuat sistem...</div>
 
     <form id="auth-form">
         <input type="email" id="email" placeholder="Email" required>
         <input type="password" id="password" placeholder="Kata Sandi" required>
-        <button type="submit" id="submit-btn" disabled>Masuk</button> <!-- Tombol nonaktif dulu -->
+        <button type="submit" id="submit-btn" disabled>Masuk</button>
     </form>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<!-- KODE UTAMA KITA -->
 <script>
-    // Fungsi ini akan dijalankan SETELAH halaman dan library Supabase selesai dimuat sepenuhnya
     window.onload = function() {
         const statusDiv = document.getElementById('status');
         const submitBtn = document.getElementById('submit-btn');
         const authForm = document.getElementById('auth-form');
 
-        try {
+        // Tunggu sebentar untuk memastikan library Supabase benar-benar sudah termuat
+        setTimeout(function() {
+            if (typeof supabase === 'undefined') {
+                statusDiv.innerText = "Error: Gagal memuat library Supabase. Periksa koneksi internet.";
+                statusDiv.style.color = 'red';
+                return;
+            }
+
             const SUPABASE_URL = 'https://jetxgfzlzitprejjiiep.supabase.co';
             const SUPABASE_KEY = 'sb_publishable_m6xvCvQxecLJqGVNV75iCw_tYoYOOJs'; 
 
             // Inisialisasi Supabase
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             
-            // Jika berhasil dimuat, ubah status dan aktifkan tombol
             statusDiv.innerText = 'Sistem siap. Silakan login.';
             statusDiv.style.color = 'green';
             submitBtn.disabled = false;
@@ -73,13 +77,12 @@
                     statusDiv.style.color = 'red';
                 }
             });
-
-        } catch (error) {
-            statusDiv.innerText = "Error Sistem: " + error.message;
-            statusDiv.style.color = 'red';
-        }
+        }, 500); // Jeda 0.5 detik agar library siap
     };
 </script>
+
+<!-- PINDAHKAN LIBRARY SUPABASE KE PALING BAWAH -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 </body>
 </html>

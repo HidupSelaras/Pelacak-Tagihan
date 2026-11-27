@@ -3,86 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pelacak Tagihan</title>
+    <title>Login Pelacak Tagihan</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 90%; max-width: 350px; }
         h2 { text-align: center; color: #333; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #3ECF8E; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;}
-        #status { margin-top: 15px; font-size: 14px; text-align: center; font-weight: bold; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #10b981; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:disabled { background-color: #9ca3af; }
+        #pesan { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="card">
+<div class="box">
     <h2>Masuk</h2>
-    <div id="status">Memuat sistem...</div>
-
-    <form id="auth-form">
+    <div id="pesan" style="color: blue;">Menyiapkan sistem...</div>
+    
+    <form id="form-login">
         <input type="email" id="email" placeholder="Email" required>
         <input type="password" id="password" placeholder="Kata Sandi" required>
-        <button type="submit" id="submit-btn" disabled>Masuk</button>
+        <button type="submit" id="tombol">Masuk</button>
     </form>
 </div>
 
-<!-- KODE UTAMA KITA -->
-<script>
-    window.onload = function() {
-        const statusDiv = document.getElementById('status');
-        const submitBtn = document.getElementById('submit-btn');
-        const authForm = document.getElementById('auth-form');
-
-        // Tunggu sebentar untuk memastikan library Supabase benar-benar sudah termuat
-        setTimeout(function() {
-            if (typeof supabase === 'undefined') {
-                statusDiv.innerText = "Error: Gagal memuat library Supabase. Periksa koneksi internet.";
-                statusDiv.style.color = 'red';
-                return;
-            }
-
-            const SUPABASE_URL = 'https://jetxgfzlzitprejjiiep.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_m6xvCvQxecLJqGVNV75iCw_tYoYOOJs'; 
-
-            // Inisialisasi Supabase
-            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            
-            statusDiv.innerText = 'Sistem siap. Silakan login.';
-            statusDiv.style.color = 'green';
-            submitBtn.disabled = false;
-
-            authForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                statusDiv.innerText = 'Memproses...';
-                statusDiv.style.color = 'blue';
-                
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-
-                try {
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({
-                        email: email,
-                        password: password
-                    });
-
-                    if (error) {
-                        statusDiv.innerText = "Gagal: " + error.message;
-                        statusDiv.style.color = 'red';
-                    } else {
-                        statusDiv.innerText = "SUKSES! Login berhasil.";
-                        statusDiv.style.color = 'green';
-                    }
-                } catch (err) {
-                    statusDiv.innerText = "Error Jaringan: " + err.message;
-                    statusDiv.style.color = 'red';
-                }
-            });
-        }, 500); // Jeda 0.5 detik agar library siap
-    };
-</script>
-
-<!-- PINDAHKAN LIBRARY SUPABASE KE PALING BAWAH -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // Kunci dan URL sudah terpasang permanen di sini
+    const URL_SUPABASE = 'https://jetxgfzlzitprejjiiep.supabase.co';
+    const KEY_SUPABASE = 'sb_publishable_m6xvCvQxecLJqGVNV75iCw_tYoYOOJs';
+
+    const pesanDiv = document.getElementById('pesan');
+    const form = document.getElementById('form-login');
+    const tombol = document.getElementById('tombol');
+
+    // Langsung jalankan setelah script supabase dimuat
+    try {
+        // Buat koneksi
+        const klienSupabase = supabase.createClient(URL_SUPABASE, KEY_SUPABASE);
+        
+        pesanDiv.innerText = "Sistem Siap.";
+        pesanDiv.style.color = "green";
+        tombol.disabled = false;
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            pesanDiv.innerText = "Memproses...";
+            pesanDiv.style.color = "blue";
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const { data, error } = await klienSupabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    pesanDiv.innerText = "Gagal: " + error.message;
+                    pesanDiv.style.color = "red";
+                } else {
+                    pesanDiv.innerText = "SUKSES! Login berhasil.";
+                    pesanDiv.style.color = "green";
+                    alert("Selamat! Anda berhasil masuk.");
+                    // Nanti kita arahkan ke halaman dashboard di sini
+                }
+            } catch (err) {
+                pesanDiv.innerText = "Error Jaringan: " + err.message;
+                pesanDiv.style.color = "red";
+            }
+        });
+
+    } catch (error) {
+        pesanDiv.innerText = "Gagal memuat Supabase: " + error.message;
+        pesanDiv.style.color = "red";
+    }
+</script>
 
 </body>
 </html>

@@ -3,31 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tes Aplikasi</title>
+    <title>Pelacak Tagihan</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-        button { padding: 15px; font-size: 18px; background-color: #3ECF8E; color: white; border: none; border-radius: 5px; width: 100%; }
-        #hasil { margin-top: 20px; font-size: 20px; font-weight: bold; color: red; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
+        h2 { text-align: center; color: #333; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #3ECF8E; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;}
+        #status { margin-top: 15px; font-size: 14px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h2>Halaman Tes</h2>
-    <form id="form-tes">
-        <input type="text" placeholder="Ketik apa saja" style="padding:10px; width:100%; margin-bottom:10px;">
-        <button type="submit">Klik Saya</button>
+<div class="card">
+    <h2>Masuk</h2>
+    <div id="status"></div>
+
+    <form id="auth-form">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Kata Sandi" required>
+        <button type="submit">Masuk</button>
     </form>
+</div>
 
-    <div id="hasil">Belum diklik</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
-        // Skrip paling sederhana untuk mengetes apakah JavaScript berjalan
-        document.getElementById('form-tes').addEventListener('submit', function(e) {
-            e.preventDefault(); // Mencegah halaman refresh
-            document.getElementById('hasil').innerText = "BERHASIL! JavaScript berjalan.";
-            document.getElementById('hasil').style.color = "green";
+<script>
+    // TAMPILKAN PESAN DI SINI JIKA ADA MASALAH
+    const statusDiv = document.getElementById('status');
+
+    try {
+        const SUPABASE_URL = 'https://jetxgfzlzitprejjiiep.supabase.co';
+        // PASTIKAN KUNCI DI BAWAH INI DISALIN UTUH SAMPAI HABIS
+        const SUPABASE_KEY = 'sb_publishable_m6xvCvQxecLJqGVNV75iCw_tYoYOOJs'; 
+
+        // Cek apakah kunci sudah benar (harus diawali sb_publishable_)
+        if (!SUPABASE_KEY.startsWith('sb_publishable_')) {
+            throw new Error("Kunci API salah atau tidak lengkap!");
+        }
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const authForm = document.getElementById('auth-form');
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            statusDiv.innerText = 'Memproses...';
+            statusDiv.style.color = 'blue';
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    // Jika email/password salah, munculkan pesan aslinya di sini
+                    statusDiv.innerText = "Gagal: " + error.message;
+                    statusDiv.style.color = 'red';
+                } else {
+                    statusDiv.innerText = "SUKSES! Login berhasil.";
+                    statusDiv.style.color = 'green';
+                }
+            } catch (err) {
+                statusDiv.innerText = "Error Jaringan: " + err.message;
+                statusDiv.style.color = 'red';
+            }
         });
-    </script>
+
+    } catch (error) {
+        // Jika ada masalah saat memuat skrip/kunci, pesan ini PASTI muncul
+        statusDiv.innerText = error.message;
+        statusDiv.style.color = 'red';
+        statusDiv.style.fontSize = '12px';
+    }
+</script>
 
 </body>
 </html>

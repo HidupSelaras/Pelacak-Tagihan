@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pelacak Tagihan - Login</title>
+    <title>Pelacak Tagihan</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 350px; }
@@ -11,15 +11,13 @@
         input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background-color: #3ECF8E; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;}
         button:hover { background-color: #2ea874; }
-        .toggle-text { text-align: center; margin-top: 15px; font-size: 14px; color: #666; cursor: pointer; }
-        .error { color: red; font-size: 13px; text-align: center; margin-top: 10px; }
+        .error { color: red; font-size: 13px; text-align: center; margin-top: 10px; font-weight: bold;}
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2 id="form-title">Masuk</h2>
-    
+    <h2>Masuk</h2>
     <div id="error-msg" class="error"></div>
 
     <form id="auth-form">
@@ -27,72 +25,44 @@
         <input type="password" id="password" placeholder="Kata Sandi" required>
         <button type="submit" id="submit-btn">Masuk</button>
     </form>
-
-    <div class="toggle-text" id="toggle-auth">
-        Belum punya akun? Daftar di sini
-    </div>
 </div>
 
-<!-- Hubungkan ke Supabase (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    // GANTI DENGAN URL DAN KEY ANDA
+    // PASTIKAN URL DAN KEY DI BAWAH INI SUDAH BENAR
     const SUPABASE_URL = 'https://jetxgfzlzitprejjiiep.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_m6xvCvQxecLJqGVNV75iCw_tYoYOOJs'; 
+    const SUPABASE_KEY = 'ISI_DENGAN_PUBLISHABLE_KEY_ANDA_LENGKAP'; 
 
-    // Inisialisasi Supabase
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let isLoginMode = true;
-    const formTitle = document.getElementById('form-title');
-    const submitBtn = document.getElementById('submit-btn');
-    const toggleAuth = document.getElementById('toggle-auth');
-    const errorMsg = document.getElementById('error-msg');
+    
     const authForm = document.getElementById('auth-form');
+    const errorMsg = document.getElementById('error-msg');
+    const submitBtn = document.getElementById('submit-btn');
 
-    // Fungsi untuk ganti mode Login / Register
-    toggleAuth.addEventListener('click', () => {
-        isLoginMode = !isLoginMode;
-        errorMsg.innerText = '';
-        if(isLoginMode) {
-            formTitle.innerText = 'Masuk';
-            submitBtn.innerText = 'Masuk';
-            toggleAuth.innerText = 'Belum punya akun? Daftar di sini';
-        } else {
-            formTitle.innerText = 'Daftar';
-            submitBtn.innerText = 'Daftar';
-            toggleAuth.innerText = 'Sudah punya akun? Masuk di sini';
-        }
-    });
-
-    // Fungsi ketika tombol submit ditekan
     authForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        errorMsg.innerText = '';
-        submitBtn.innerText = 'Memproses...';
+        errorMsg.innerText = 'Memproses...';
+        errorMsg.style.color = 'blue';
         
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
 
-        let { data, error } = isLoginMode 
-            ? await supabase.auth.signInWithPassword({ email, password })
-            : await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
 
         if (error) {
-            errorMsg.innerText = error.message;
-            submitBtn.innerText = isLoginMode ? 'Masuk' : 'Daftar';
+            errorMsg.innerText = "Error: " + error.message;
+            errorMsg.style.color = 'red';
+            submitBtn.innerText = 'Masuk';
         } else {
-            if (!isLoginMode) {
-                alert('Pendaftaran berhasil! Silakan cek email Anda (jika verifikasi aktif) atau langsung masuk.');
-                // Jika verifikasi email dimatikan, langsung login
-            } else {
-                alert('Login berhasil!');
-                // Nanti kita akan arahkan ke halaman dashboard di sini
-            }
+            errorMsg.innerText = 'Login Berhasil!';
+            errorMsg.style.color = 'green';
+            alert("Selamat datang!");
         }
     });
 </script>
-
 </body>
 </html>
